@@ -1,3 +1,5 @@
+// const { json } = require("express");
+
 let noteForm;
 let noteTitle;
 let noteText;
@@ -36,14 +38,15 @@ const getNotes = () =>
     }
   });
 
-const saveNote = (note) =>
+const addNote = (note) =>
   fetch('/api/notes', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify(note)
-  });
+  })
+
 
 const deleteNote = (id) =>
   fetch(`/api/notes/${id}`, {
@@ -75,12 +78,13 @@ const renderActiveNote = () => {
 const handleNoteSave = () => {
   const newNote = {
     title: noteTitle.value,
-    text: noteText.value
+    text: noteText.value,
   };
-  saveNote(newNote).then(() => {
-    getAndRenderNotes();
-    renderActiveNote();
-  });
+  addNote(newNote)
+    .then(() => {
+      getAndRenderNotes();
+      renderActiveNote();
+    });
 };
 
 // Delete the clicked note
@@ -90,7 +94,7 @@ const handleNoteDelete = (e) => {
 
   const note = e.target;
   const noteId = JSON.parse(note.parentElement.getAttribute('data-note')).id;
-
+  console.log(noteId)
   if (activeNote.id === noteId) {
     activeNote = {};
   }
@@ -180,6 +184,7 @@ const renderNoteList = async (notes) => {
     noteListItems.forEach((note) => noteList[0].append(note));
   }
 };
+
 
 // Gets notes from the db and renders them to the sidebar
 const getAndRenderNotes = () => getNotes().then(renderNoteList);
