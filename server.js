@@ -11,6 +11,7 @@ const api = require('./routes/index.js');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
 //  GET function for main screen http://localhost:3001
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '/public/index.html'))
@@ -18,8 +19,9 @@ app.get('/', (req, res) => {
 //  GET function for http://localhost:3001/notes end
 app.get('/notes', (req, res) => {
     res.sendFile(path.join(__dirname, '/public/notes.html'))
-})
+});
 
+// GET function for path http://localhost:3001/api/notes
 app.get('/api/notes', (req, res) => {
     fs.readFile('./db/db.json', 'utf-8', (err, data) => {
         if (err) {
@@ -30,18 +32,13 @@ app.get('/api/notes', (req, res) => {
         }
     });
 
-})
+});
 
+// POST function for path http://localhost:3001/api/notes
 app.post('/api/notes', (req, res) => {
-
-    console.log(req.body);
-    // Destructuring assignment for the items in req.body
     const { title, text } = req.body;
-
-    // If all the required properties are present
     if (text && title) {
-        // Variable for the object we will save
-        const newReview = {
+        const newNote = {
             text,
             title,
             id: Math.floor(Math.random() * 10000)
@@ -51,19 +48,29 @@ app.post('/api/notes', (req, res) => {
                 console.error(err);
             } else {
                 const dataNotes = JSON.parse(data);
-                dataNotes.push(newReview);
+                dataNotes.push(newNote);
                 fs.writeFile('./db/db.json', JSON.stringify(dataNotes, null, '\t'), (err) => console.error(err))
             }
         })
         res.end();
     }
-})
+});
 
+// delete function for path http://localhost:3001/api/notes/:id (deleting id that was choosen)
 app.delete('/api/notes/:term', (req, res) => {
-    const requestID = req.params.id;
-    console.log(requestID);
-    res.end();
-})
+    const requestID = req.params.term;
+    fs.readFile('./db/db.json', 'utf-8', (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            const dataNotes = JSON.parse(data);
+            let newDataNotes = dataNotes.filter(el => el.id !== parseInt(requestID));
+            fs.writeFile('./db/db.json', JSON.stringify(newDataNotes, null, '\t'), (err) => console.error(err));
+
+        }
+    });
+    res.send(requestID);
+});
 // server listenner when user trying to get http://localhost:3001 
 app.listen(PORT, () =>
     console.log(`app listennig : http://localhost:${PORT}`));

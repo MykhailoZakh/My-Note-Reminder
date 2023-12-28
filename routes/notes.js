@@ -17,12 +17,12 @@ note.get('/', (req, res) => {
 // POST function for path http://localhost:3001/api/notes
 note.post('/', (req, res) => {
     console.log(req.body);
-    // Destructuring assignment for the items in req.body
+
     const { title, text } = req.body;
 
-    // If all the required properties are present
+
     if (text && title) {
-        // Variable for the object we will save
+
         const newReview = {
             text,
             title,
