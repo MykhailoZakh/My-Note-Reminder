@@ -41,4 +41,20 @@ note.post('/', (req, res) => {
     }
 })
 
+// delete function for path http://localhost:3001/api/notes/:id (deleting id that was choosen)
+note.delete('/:term', (req, res) => {
+    const requestID = req.params.term;
+    fs.readFile('./db/db.json', 'utf-8', (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            const dataNotes = JSON.parse(data);
+            let newDataNotes = dataNotes.filter(el => el.id !== parseInt(requestID));
+            fs.writeFile('./db/db.json', JSON.stringify(newDataNotes, null, '\t'), (err) => console.error(err));
+
+        }
+    });
+    res.send(requestID);
+});
+
 module.exports = note;
